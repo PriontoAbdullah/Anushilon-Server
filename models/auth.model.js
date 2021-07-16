@@ -20,9 +20,18 @@ const userScheama = new mongoose.Schema(
       required: true,
     },
     salt: String,
+    avatar: {
+      type: String,
+      default: "https://i.imgur.com/VlhF3IL.png",
+    },
+    profile: {
+      type: Schema.Types.ObjectId,
+      ref: "Profile",
+    },
     role: {
       type: String,
-      default: "subscriber",
+      enum: ["institution", "student", "teacher"],
+      default: "student",
     },
     resetPasswordLink: {
       data: String,

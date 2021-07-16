@@ -3,23 +3,26 @@ const morgan = require("morgan");
 const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-// Config dotev
+
+// config dotenv
 require("dotenv").config({
   path: "./config/config.env",
 });
 
+// create app
 const app = express();
 
-// Connect to database
+// connect to database
 connectDB();
 
 // body parser
 app.use(bodyParser.json());
-// Load routes
+
+// load routes
 const authRouter = require("./routes/auth.route");
 const userRouter = require("./routes/user.route");
 
-// Dev Logginf Middleware
+// development environment middleware
 if (process.env.NODE_ENV === "development") {
   app.use(
     cors({
@@ -29,10 +32,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// Use Routes
+// use routes
 app.use("/api", authRouter);
 app.use("/api", userRouter);
 
+// page not found
 app.use((req, res) => {
   res.status(404).json({
     success: false,
