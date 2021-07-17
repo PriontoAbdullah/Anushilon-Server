@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const crypto = require("crypto");
 // user schema
 const userScheama = new mongoose.Schema(
@@ -22,7 +23,7 @@ const userScheama = new mongoose.Schema(
     salt: String,
     avatar: {
       type: String,
-      default: "https://i.imgur.com/VlhF3IL.png",
+      default: "https://i.imgur.com/R5o51PR.png",
     },
     profile: {
       type: Schema.Types.ObjectId,

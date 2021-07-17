@@ -17,7 +17,7 @@ const {
   validLogin,
   forgotPasswordValidator,
   resetPasswordValidator,
-} = require("../helpers/valid");
+} = require("../helpers/validator");
 
 router.post("/register", validSign, registerController);
 

@@ -25,7 +25,7 @@ exports.registerController = (req, res) => {
   );
   oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -39,7 +39,7 @@ exports.registerController = (req, res) => {
     }).exec((err, user) => {
       if (user) {
         return res.status(400).json({
-          errors: "Email is taken",
+          errors: "এই ইমেইল পূর্বে নেওয়া হয়েছে",
         });
       }
     });
@@ -50,6 +50,7 @@ exports.registerController = (req, res) => {
         name,
         email,
         password,
+        role,
       },
       process.env.JWT_ACCOUNT_ACTIVATION,
       {
@@ -93,7 +94,7 @@ exports.registerController = (req, res) => {
     sendMail()
       .then((result) => {
         return res.json({
-          message: `Email has been sent to ${email}`,
+          message: `ইমেইল প্রেরণ করা হয়েছে ${email} এই ঠিকানায়। দয়া করে আপনার মেইলের ইনবক্স চেক করুন।`,
         });
       })
       .catch((err) => {
@@ -114,22 +115,22 @@ exports.activationController = (req, res) => {
       if (err) {
         // console.log("Activation error");
         return res.status(401).json({
-          errors: "Expired link. Signup again",
+          errors: "মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার সাইন আপ করুন।",
         });
       } else {
-        const { name, email, password } = jwt.decode(token);
+        const { name, email, password, role } = jwt.decode(token);
 
-        console.log(email);
         const user = new User({
           name,
           email,
           password,
+          role,
         });
 
         // new user information save to database
         user.save((err, user) => {
           if (err) {
-            console.log("Save error", errorHandler(err));
+            // console.log("Save error", errorHandler(err));
             return res.status(401).json({
               errors: errorHandler(err),
             });
@@ -137,7 +138,7 @@ exports.activationController = (req, res) => {
             return res.json({
               success: true,
               user,
-              message: "Signup success",
+              message: "আপনার নতুন অ্যাকাউন্টটি সফলভাবে নিবন্ধিত হয়েছে",
             });
           }
         });
@@ -145,7 +146,7 @@ exports.activationController = (req, res) => {
     });
   } else {
     return res.json({
-      message: "error happening please try again",
+      message: "কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন",
     });
   }
 };
