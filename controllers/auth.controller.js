@@ -39,7 +39,7 @@ exports.registerController = (req, res) => {
     }).exec((err, user) => {
       if (user) {
         return res.status(400).json({
-          errors: "এই ইমেইল পূর্বে নেওয়া হয়েছে",
+          errors: "এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন",
         });
       }
     });
@@ -168,13 +168,14 @@ exports.signinController = (req, res) => {
     }).exec((err, user) => {
       if (err || !user) {
         return res.status(400).json({
-          errors: "User with that email does not exist. Please signup",
+          errors:
+            "এই ইমেইল ঠিকানাটি নিবন্ধিত নয়, অনুগ্রহপূর্বক আগে এই ইমেইলটি নিবন্ধন করুন",
         });
       }
       // authenticate
       if (!user.authenticate(password)) {
         return res.status(400).json({
-          errors: "Email and password do not match",
+          errors: "ইমেইল এবং পাসওয়ার্ড এর মধ্যে মিল পাওয়া যায়নি",
         });
       }
       // generate a token and send to client
@@ -214,13 +215,13 @@ exports.adminMiddleware = (req, res, next) => {
   }).exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: "User not found",
+        error: "ব্যবহারকারীর একাউন্ট খুঁজে পাওয়া যায়নি!",
       });
     }
 
     if (user.role !== "admin") {
       return res.status(400).json({
-        error: "Admin resource. Access denied.",
+        error: "এটি এডমিন অ্যাকাউন্ট নয় । অ্যাক্সেস অস্বীকৃত।",
       });
     }
 
@@ -239,7 +240,7 @@ exports.forgotPasswordController = (req, res) => {
   );
   oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
-  const { email } = req.body;
+  const { forgetEmail } = req.body;
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -250,12 +251,12 @@ exports.forgotPasswordController = (req, res) => {
   } else {
     User.findOne(
       {
-        email,
+        forgetEmail,
       },
       (err, user) => {
         if (err || !user) {
           return res.status(400).json({
-            error: "User with that email does not exist",
+            errors: "এই ইমেইল এর ব্যবহারকারী বিদ্যমান নেই",
           });
         }
 
@@ -266,7 +267,7 @@ exports.forgotPasswordController = (req, res) => {
           },
           process.env.JWT_RESET_PASSWORD,
           {
-            expiresIn: "1h",
+            expiresIn: "12h",
           }
         );
 
@@ -289,7 +290,7 @@ exports.forgotPasswordController = (req, res) => {
 
             const emailData = {
               from: process.env.EMAIL_FROM,
-              to: email,
+              to: forgetEmail,
               subject: `অনুশীলনে পাসওয়ার্ড রিসেট লিঙ্ক`,
               text: `আপনার পাসওয়ার্ডটি পুনরায় সেট করতে নীচের লিঙ্কটি ব্যবহার করুন - ${process.env.CLIENT_URL}/users/password/reset/${token}`,
               html: passwordResetTemplate(token), // html template
@@ -312,15 +313,15 @@ exports.forgotPasswordController = (req, res) => {
             if (err) {
               // console.log("RESET PASSWORD LINK ERROR", err);
               return res.status(400).json({
-                error:
-                  "Database connection error on user password forgot request",
+                errors:
+                  "ব্যবহারকারী পাসওয়ার্ড ডাটাবেস সংযোগ ত্রুটি অনুরোধ ভুলে গেছে",
               });
             } else {
               sendMail()
                 .then((result) => {
                   // console.log("SIGNUP EMAIL SENT", result);
                   return res.json({
-                    message: `Email has been sent to ${email}. Follow the instruction to set your new password`,
+                    message: `ইমেল প্রেরণ করা হয়েছে ${forgetEmail} এই ইমেইলে। আপনার নতুন পাসওয়ার্ড সেট করার নির্দেশ অনুসরণ করুন।`,
                   });
                 })
                 .catch((err) => {
@@ -357,7 +358,7 @@ exports.resetPasswordController = (req, res) => {
         function (err, decoded) {
           if (err) {
             return res.status(400).json({
-              error: "Expired link. Try again",
+              errors: "মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার চেষ্টা করুন।",
             });
           }
 
@@ -369,7 +370,7 @@ exports.resetPasswordController = (req, res) => {
             (err, user) => {
               if (err || !user) {
                 return res.status(400).json({
-                  error: "Something went wrong. Try later",
+                  errors: "কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন",
                 });
               }
 
@@ -383,11 +384,12 @@ exports.resetPasswordController = (req, res) => {
               user.save((err, result) => {
                 if (err) {
                   return res.status(400).json({
-                    error: "Error resetting user password",
+                    errors:
+                      "ব্যবহারকারীর পাসওয়ার্ড পুনরায় সেট করার সময় ত্রুটি ঘটেছে",
                   });
                 }
                 res.json({
-                  message: `Great! Now you can login with your new password`,
+                  message: `অভিনন্দন! এখন আপনি আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারেন।`,
                 });
               });
             }
@@ -448,13 +450,13 @@ exports.googleController = (req, res) => {
             // if the user doesn't have registered email
             return res.status(400).json({
               error:
-                "Please register first with this gmail account. Only registered gmail address can sign in with the google account.",
+                "এই জিমেইল অ্যাকাউন্টটি দিয়ে প্রথমে নিবন্ধন করুন। কেবলমাত্র নিবন্ধিত ইমেইল একাউন্ট দিয়েই গুগল অ্যাকাউন্টে সাইন ইন করা যাবে।",
             });
           }
         });
       } else {
         return res.status(400).json({
-          error: "Google login failed. Try again",
+          error: "গুগল একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।",
         });
       }
     });
@@ -514,14 +516,14 @@ exports.facebookController = (req, res) => {
             // if the user doesn't have registered email
             return res.status(400).json({
               error:
-                "Please register first with this facebook email address. Only registered email address can sign in with the facebook account.",
+                "ফেসবুক অ্যাকাউন্টটির ইমেল দিয়ে প্রথমে নিবন্ধন করুন। কেবল নিবন্ধিত ইমেল একাউন্ট দিয়েই ফেসবুক অ্যাকাউন্টের মাধ্যমে সাইন ইন করা যাবে।",
             });
           }
         });
       })
       .catch((error) => {
         res.json({
-          error: "Facebook login failed. Try later",
+          error: "ফেসবুক একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।",
         });
       })
   );

@@ -27,7 +27,7 @@ exports.validLogin = [
 ];
 
 exports.forgotPasswordValidator = [
-  check("email")
+  check("forgetEmail")
     .not()
     .isEmpty()
     .isEmail()
@@ -36,9 +36,6 @@ exports.forgotPasswordValidator = [
 
 exports.resetPasswordValidator = [
   check("newPassword")
-    .not()
-    .isEmpty()
-    .isLength({ min: 8 })
     .isStrongPassword()
     .withMessage(
       "পাসওয়ার্ডটি কমপক্ষে ৮ টি অক্ষরের দীর্ঘ হতে হবে এবং কমপক্ষে একটি ছোট হাতের অক্ষর, একটি বড় হাতের অক্ষর, একটি নম্বর এবং একটি চিহ্ন থাকতে হবে"
