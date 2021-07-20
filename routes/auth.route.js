@@ -4,6 +4,7 @@ const router = express.Router();
 // Load Controllers
 const {
   registerController,
+  registrationController,
   activationController,
   signinController,
   forgotPasswordController,
@@ -14,12 +15,15 @@ const {
 
 const {
   validSign,
+  validUserSign,
   validLogin,
   forgotPasswordValidator,
   resetPasswordValidator,
 } = require("../helpers/validator");
 
 router.post("/register", validSign, registerController);
+
+router.post("/registration", validUserSign, registrationController);
 
 router.post("/login", validLogin, signinController);
 

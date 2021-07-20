@@ -1,4 +1,11 @@
-const activationTemplate = (token) => {
+const activationUserTemplate = (
+  token,
+  institution,
+  name,
+  email,
+  mobile,
+  role
+) => {
   return `<html>
     <head>
       <title></title>
@@ -210,7 +217,9 @@ const activationTemplate = (token) => {
                               bgcolor="#2A2A57"
                             >
                               <a
-                                href=${process.env.CLIENT_URL}/users/activate/${token} 
+                                href=${
+                                  process.env.CLIENT_URL
+                                }/users/activate/${token} 
                                 target="_blank"
                                 style="
                                   font-size: 20px;
@@ -331,6 +340,67 @@ const activationTemplate = (token) => {
             </table>
           </td>
         </tr>
+
+        <tr>
+        <td
+          bgcolor="#f4f4f4"
+          align="center"
+          style="padding: 30px 10px 0px 10px"
+        >
+          <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="max-width: 600px"
+          >
+            <tr>
+              <td
+                bgcolor="#E8EAF6"
+                align="center"
+                style="
+                  padding: 30px 30px 30px 30px;
+                  border-radius: 4px 4px 4px 4px;
+                  color: #666666;
+                  font-family: 'Hind Siliguri', 'Open Sans', sans-serif;
+                  font-size: 18px;
+                  font-weight: 400;
+                  line-height: 30px;
+                "
+              >
+                <h2
+                  style="
+                    font-size: 20px;
+                    font-weight: 400;
+                    color: #111111;
+                    margin: 0;
+                    padding-bottom: 10px;
+                  "
+                >
+                নতুন একটি একাউন্ট একটিভ হওয়ার তথ্য সমূহ 
+                </h2>
+                <p style="margin: 0">
+                  শিক্ষা প্রতিষ্ঠানের নাম: ${institution}
+                </p>
+                <p style="margin: 0">
+                  ${
+                    role === "student"
+                      ? "শিক্ষার্থীর নাম : "
+                      : "শিক্ষকের নাম : "
+                  } ${name}
+                </p>
+                <p style="margin: 0">
+                  ইমেইল : ${email}
+                </p>
+                <p style="margin: 0">
+                  মোবাইল : ${mobile}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
         <tr>
           <td
             bgcolor="#f4f4f4"
@@ -438,4 +508,4 @@ const activationTemplate = (token) => {
   `;
 };
 
-module.exports = activationTemplate;
+module.exports = activationUserTemplate;

@@ -155,7 +155,7 @@ const passwordResetTemplate = (token) => {
                     অনুশীলনে আপনাকে স্বাগতম!
                   </h1>
                   <img
-                    src="https://anushilon-bd.web.app/static/media/logo-banner.502ecde5.png"
+                    src="https://res.cloudinary.com/prionto/image/upload/v1626700849/FB_Post_s8dabq.png"
                     width="400"
                     style="display: block; border: 0px"
                   />
