@@ -46,6 +46,17 @@ exports.registerController = (req, res) => {
       }
     });
 
+    User.findOne({
+      name,
+    }).exec((err, user) => {
+      if (user) {
+        return res.status(400).json({
+          errors:
+            "এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄",
+        });
+      }
+    });
+
     // jwt token creation
     const token = jwt.sign(
       {
@@ -134,6 +145,17 @@ exports.registrationController = (req, res) => {
         return res.status(400).json({
           errors:
             "এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন 🙄",
+        });
+      }
+    });
+
+    User.findOne({
+      name,
+    }).exec((err, user) => {
+      if (user) {
+        return res.status(400).json({
+          errors:
+            "এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄",
         });
       }
     });
@@ -266,41 +288,63 @@ exports.signinController = (req, res) => {
     // check if user exist
     User.findOne({
       email,
-    }).exec((err, user) => {
-      if (err || !user) {
-        return res.status(400).json({
-          errors:
-            "এই ইমেইল ঠিকানাটি নিবন্ধিত নয়, অনুগ্রহপূর্বক আগে এই ইমেইলটি নিবন্ধন করুন 🙄",
-        });
-      }
-      // authenticate
-      if (!user.authenticate(password)) {
-        return res.status(400).json({
-          errors: "ইমেইল এবং পাসওয়ার্ড এর মধ্যে মিল পাওয়া যায়নি 🤨",
-        });
-      }
-      // generate a token and send to client
-      const token = jwt.sign(
-        {
-          _id: user._id,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "7d",
+    })
+      .populate("followers following", "avatar name followers following")
+      .exec((err, user) => {
+        if (err || !user) {
+          return res.status(400).json({
+            errors:
+              "এই ইমেইল ঠিকানাটি নিবন্ধিত নয়, অনুগ্রহপূর্বক আগে এই ইমেইলটি নিবন্ধন করুন 🙄",
+          });
         }
-      );
-      const { _id, name, email, role } = user;
+        // authenticate
+        if (!user.authenticate(password)) {
+          return res.status(400).json({
+            errors: "ইমেইল এবং পাসওয়ার্ড এর মধ্যে মিল পাওয়া যায়নি 🤨",
+          });
+        }
+        // generate a token and send to client
+        const token = jwt.sign(
+          {
+            _id: user._id,
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "7d",
+          }
+        );
 
-      return res.json({
-        token,
-        user: {
+        const {
           _id,
           name,
           email,
           role,
-        },
+          avatar,
+          story,
+          address,
+          website,
+          followers,
+          following,
+          saved,
+        } = user;
+
+        return res.json({
+          token,
+          user: {
+            _id,
+            name,
+            email,
+            role,
+            avatar,
+            story,
+            address,
+            website,
+            followers,
+            following,
+            saved,
+          },
+        });
       });
-    });
   }
 };
 
@@ -515,46 +559,78 @@ exports.googleController = (req, res) => {
       const { email_verified, name, email } = response.payload;
       // if find registered user email
       if (email_verified) {
-        User.findOne({ email }).exec((err, user) => {
-          if (user) {
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-              expiresIn: "7d",
-            });
-            const { _id, email, name, role } = user;
-            return res.json({
-              token,
-              user: { _id, email, name, role },
-            });
-          } else {
-            // if the user doesn't have registered email
-            // let password = email + process.env.JWT_SECRET;
-            // user = new User({ name, email, password });
-            // user.save((err, data) => {
-            //   if (err) {
-            //     console.log("ERROR GOOGLE LOGIN ON USER SAVE", err);
-            //     return res.status(400).json({
-            //       error: "User signup failed with google",
-            //     });
-            //   }
-            //   const token = jwt.sign(
-            //     { _id: data._id },
-            //     process.env.JWT_SECRET,
-            //     { expiresIn: "7d" }
-            //   );
-            //   const { _id, email, name, role } = data;
-            //   return res.json({
-            //     token,
-            //     user: { _id, email, name, role },
-            //   });
-            // });
+        User.findOne({ email })
+          .populate("followers following", "avatar name followers following")
+          .exec((err, user) => {
+            if (user) {
+              const token = jwt.sign(
+                { _id: user._id },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: "7d",
+                }
+              );
 
-            // if the user doesn't have registered email
-            return res.status(400).json({
-              error:
-                "এই জিমেইল অ্যাকাউন্টটি দিয়ে প্রথমে নিবন্ধন করুন। কেবলমাত্র নিবন্ধিত ইমেইল একাউন্ট দিয়েই গুগল অ্যাকাউন্টে সাইন ইন করা যাবে। 🙏",
-            });
-          }
-        });
+              const {
+                _id,
+                name,
+                email,
+                role,
+                avatar,
+                story,
+                address,
+                website,
+                followers,
+                following,
+                saved,
+              } = user;
+
+              return res.json({
+                token,
+                user: {
+                  _id,
+                  name,
+                  email,
+                  role,
+                  avatar,
+                  story,
+                  address,
+                  website,
+                  followers,
+                  following,
+                  saved,
+                },
+              });
+            } else {
+              // if the user doesn't have registered email
+              // let password = email + process.env.JWT_SECRET;
+              // user = new User({ name, email, password });
+              // user.save((err, data) => {
+              //   if (err) {
+              //     console.log("ERROR GOOGLE LOGIN ON USER SAVE", err);
+              //     return res.status(400).json({
+              //       error: "User signup failed with google",
+              //     });
+              //   }
+              //   const token = jwt.sign(
+              //     { _id: data._id },
+              //     process.env.JWT_SECRET,
+              //     { expiresIn: "7d" }
+              //   );
+              //   const { _id, email, name, role } = data;
+              //   return res.json({
+              //     token,
+              //     user: { _id, email, name, role },
+              //   });
+              // });
+
+              // if the user doesn't have registered email
+              return res.status(400).json({
+                error:
+                  "এই জিমেইল অ্যাকাউন্টটি দিয়ে প্রথমে নিবন্ধন করুন। কেবলমাত্র নিবন্ধিত ইমেইল একাউন্ট দিয়েই গুগল অ্যাকাউন্টে সাইন ইন করা যাবে। 🙏",
+              });
+            }
+          });
       } else {
         return res.status(400).json({
           error: "গুগল একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন। 😕",
@@ -578,44 +654,76 @@ exports.facebookController = (req, res) => {
       // .then(response => console.log(response))
       .then((response) => {
         const { email, name } = response;
-        User.findOne({ email }).exec((err, user) => {
-          if (user) {
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-              expiresIn: "7d",
-            });
-            const { _id, email, name, role } = user;
-            return res.json({
-              token,
-              user: { _id, email, name, role },
-            });
-          } else {
-            // let password = email + process.env.JWT_SECRET;
-            // user = new User({ name, email, password });
-            // user.save((err, data) => {
-            //   if (err) {
-            //     console.log("ERROR FACEBOOK LOGIN ON USER SAVE", err);
-            //     return res.status(400).json({
-            //       error: "User signup failed with facebook",
-            //     });
-            //   }
-            //   const token = jwt.sign(
-            //     { _id: data._id },
-            //     process.env.JWT_SECRET,
-            //     { expiresIn: "7d" }
-            //   );
-            //   const { _id, email, name, role } = data;
-            //   return res.json({
-            //     token,
-            //     user: { _id, email, name, role },
-            //   });
-            // });
+        User.findOne({ email })
+          .populate("followers following", "avatar name followers following")
+          .exec((err, user) => {
+            if (user) {
+              const token = jwt.sign(
+                { _id: user._id },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: "7d",
+                }
+              );
 
-            return res.status(400).json({
-              error:
-                "ফেসবুক অ্যাকাউন্টটির ইমেল দিয়ে প্রথমে নিবন্ধন করুন। কেবল নিবন্ধিত ইমেল একাউন্ট দিয়েই ফেসবুক অ্যাকাউন্টের মাধ্যমে সাইন ইন করা যাবে। 🙏",
-            });
-          }
-        });
+              const {
+                _id,
+                name,
+                email,
+                role,
+                avatar,
+                story,
+                address,
+                website,
+                followers,
+                following,
+                saved,
+              } = user;
+
+              return res.json({
+                token,
+                user: {
+                  _id,
+                  name,
+                  email,
+                  role,
+                  avatar,
+                  story,
+                  address,
+                  website,
+                  followers,
+                  following,
+                  saved,
+                },
+              });
+            } else {
+              // let password = email + process.env.JWT_SECRET;
+              // user = new User({ name, email, password });
+              // user.save((err, data) => {
+              //   if (err) {
+              //     console.log("ERROR FACEBOOK LOGIN ON USER SAVE", err);
+              //     return res.status(400).json({
+              //       error: "User signup failed with facebook",
+              //     });
+              //   }
+              //   const token = jwt.sign(
+              //     { _id: data._id },
+              //     process.env.JWT_SECRET,
+              //     { expiresIn: "7d" }
+              //   );
+              //   const { _id, email, name, role } = data;
+              //   return res.json({
+              //     token,
+              //     user: { _id, email, name, role },
+              //   });
+              // });
+
+              return res.status(400).json({
+                error:
+                  "ফেসবুক অ্যাকাউন্টটির ইমেল দিয়ে প্রথমে নিবন্ধন করুন। কেবল নিবন্ধিত ইমেল একাউন্ট দিয়েই ফেসবুক অ্যাকাউন্টের মাধ্যমে সাইন ইন করা যাবে। 🙏",
+              });
+            }
+          });
       })
       .catch((error) => {
         return res.status(400).json({

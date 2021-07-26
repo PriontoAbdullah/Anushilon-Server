@@ -25,15 +25,42 @@ const userScheama = new mongoose.Schema(
       type: String,
       default: "https://i.imgur.com/R5o51PR.png",
     },
-    profile: {
-      type: Schema.Types.ObjectId,
-      ref: "Profile",
-    },
     role: {
       type: String,
       enum: ["institution", "student", "teacher"],
       default: "student",
     },
+    address: {
+      type: String, 
+      default: ''
+    },
+    story: {
+        type: String, 
+        default: '',
+        maxlength: 200
+    },
+    website: {
+      type: String, 
+      default: ''
+    },
+    followers: [
+      {
+        type: mongoose.Types.ObjectId, 
+        ref: 'User'
+      }
+    ],
+    following: [
+      {
+        type: mongoose.Types.ObjectId, 
+        ref: 'User'
+      }
+    ],
+    saved: [
+      {
+        type: mongoose.Types.ObjectId, 
+        ref: 'User'
+      }
+    ],
     resetPasswordLink: {
       data: String,
       default: "",
