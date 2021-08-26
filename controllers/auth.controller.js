@@ -193,7 +193,7 @@ exports.registrationController = (req, res) => {
 
         const emailData = {
           from: process.env.EMAIL_FROM,
-          to: process.env.EMAIL_TO,
+          to: email,
           subject: "অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক",
           text: `আপনার অ্যাকাউন্টটি সক্রিয় করতে এই লিংকটিতে ক্লিক করুন - ${process.env.CLIENT_URL}/users/activate/${token}`,
           html: activationUserTemplate(
