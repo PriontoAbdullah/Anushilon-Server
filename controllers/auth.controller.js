@@ -1,20 +1,20 @@
-const User = require("../models/auth.model");
-const expressJwt = require("express-jwt");
-const _ = require("lodash");
-const { OAuth2Client } = require("google-auth-library");
-const fetch = require("node-fetch");
-const { validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const expressJWT = require("express-jwt");
-const { errorHandler } = require("../helpers/dbErrorHandling");
-const sgMail = require("@sendgrid/mail");
+const User = require('../models/auth.model');
+const expressJwt = require('express-jwt');
+const _ = require('lodash');
+const { OAuth2Client } = require('google-auth-library');
+const fetch = require('node-fetch');
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+const expressJWT = require('express-jwt');
+const { errorHandler } = require('../helpers/dbErrorHandling');
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.MAIL_KEY);
-const nodemailer = require("nodemailer");
-const hbs = require("nodemailer-express-handlebars");
-const { google } = require("googleapis");
-const activationTemplate = require("../templates/activationTemplate");
-const activationUserTemplate = require("../templates/activationUserTemplate");
-const passwordResetTemplate = require("../templates/passwordResetTemplate");
+const nodemailer = require('nodemailer');
+const hbs = require('nodemailer-express-handlebars');
+const { google } = require('googleapis');
+const activationTemplate = require('../templates/activationTemplate');
+const activationUserTemplate = require('../templates/activationUserTemplate');
+const passwordResetTemplate = require('../templates/passwordResetTemplate');
 
 // registration controller for individual
 exports.registerController = (req, res) => {
@@ -41,7 +41,7 @@ exports.registerController = (req, res) => {
       if (user) {
         return res.status(400).json({
           errors:
-            "এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন 🙄",
+            'এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন 🙄',
         });
       }
     });
@@ -52,7 +52,7 @@ exports.registerController = (req, res) => {
       if (user) {
         return res.status(400).json({
           errors:
-            "এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄",
+            'এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄',
         });
       }
     });
@@ -67,7 +67,7 @@ exports.registerController = (req, res) => {
       },
       process.env.JWT_ACCOUNT_ACTIVATION,
       {
-        expiresIn: "1d",
+        expiresIn: '1d',
       }
     );
 
@@ -77,9 +77,9 @@ exports.registerController = (req, res) => {
         const accessToken = await oAuth2Client.getAccessToken();
 
         const transport = nodemailer.createTransport({
-          service: "gmail",
+          service: 'gmail',
           auth: {
-            type: "OAuth2",
+            type: 'OAuth2',
             user: process.env.EMAIL_FROM,
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLEINT_SECRET,
@@ -91,7 +91,7 @@ exports.registerController = (req, res) => {
         const emailData = {
           from: process.env.EMAIL_FROM,
           to: email,
-          subject: "অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক",
+          subject: 'অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক',
           text: `আপনার অ্যাকাউন্টটি সক্রিয় করতে এই লিংকটিতে ক্লিক করুন - ${process.env.CLIENT_URL}/users/activate/${token}`,
           html: activationTemplate(token), // html template
         };
@@ -144,7 +144,7 @@ exports.registrationController = (req, res) => {
       if (user) {
         return res.status(400).json({
           errors:
-            "এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন 🙄",
+            'এই ইমেইল পূর্বে নেওয়া হয়েছে, নতুন ইমেইল দিয়ে নিবন্ধন করুন 🙄',
         });
       }
     });
@@ -155,7 +155,7 @@ exports.registrationController = (req, res) => {
       if (user) {
         return res.status(400).json({
           errors:
-            "এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄",
+            'এই নামটি পূর্বে ব্যবহার হয়েছে, নতুন নাম ব্যবহার করে নিবন্ধন করুন 🙄',
         });
       }
     });
@@ -170,7 +170,7 @@ exports.registrationController = (req, res) => {
       },
       process.env.JWT_ACCOUNT_ACTIVATION,
       {
-        expiresIn: "1d",
+        expiresIn: '1d',
       }
     );
 
@@ -180,9 +180,9 @@ exports.registrationController = (req, res) => {
         const accessToken = await oAuth2Client.getAccessToken();
 
         const transport = nodemailer.createTransport({
-          service: "gmail",
+          service: 'gmail',
           auth: {
-            type: "OAuth2",
+            type: 'OAuth2',
             user: process.env.EMAIL_FROM,
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLEINT_SECRET,
@@ -194,7 +194,7 @@ exports.registrationController = (req, res) => {
         const emailData = {
           from: process.env.EMAIL_FROM,
           to: email,
-          subject: "অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক",
+          subject: 'অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক',
           text: `আপনার অ্যাকাউন্টটি সক্রিয় করতে এই লিংকটিতে ক্লিক করুন - ${process.env.CLIENT_URL}/users/activate/${token}`,
           html: activationUserTemplate(
             token,
@@ -238,7 +238,7 @@ exports.activationController = (req, res) => {
       if (err) {
         // console.log("Activation error");
         return res.status(401).json({
-          errors: "মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার সাইন আপ করুন। 😕",
+          errors: 'মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার সাইন আপ করুন। 😕',
         });
       } else {
         const { name, email, password, role } = jwt.decode(token);
@@ -261,7 +261,7 @@ exports.activationController = (req, res) => {
             return res.json({
               success: true,
               user,
-              message: "আপনার নতুন অ্যাকাউন্টটি সফলভাবে নিবন্ধিত হয়েছে 🎉",
+              message: 'আপনার নতুন অ্যাকাউন্টটি সফলভাবে নিবন্ধিত হয়েছে 🎉',
             });
           }
         });
@@ -269,7 +269,7 @@ exports.activationController = (req, res) => {
     });
   } else {
     return res.json({
-      message: "কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন 😓",
+      message: 'কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন 😓',
     });
   }
 };
@@ -289,18 +289,18 @@ exports.signinController = (req, res) => {
     User.findOne({
       email,
     })
-      .populate("followers following", "avatar name followers following")
+      .populate('followers following', 'avatar name followers following')
       .exec((err, user) => {
         if (err || !user) {
           return res.status(400).json({
             errors:
-              "এই ইমেইল ঠিকানাটি নিবন্ধিত নয়, অনুগ্রহপূর্বক আগে এই ইমেইলটি নিবন্ধন করুন 🙄",
+              'এই ইমেইল ঠিকানাটি নিবন্ধিত নয়, অনুগ্রহপূর্বক আগে এই ইমেইলটি নিবন্ধন করুন 🙄',
           });
         }
         // authenticate
         if (!user.authenticate(password)) {
           return res.status(400).json({
-            errors: "ইমেইল এবং পাসওয়ার্ড এর মধ্যে মিল পাওয়া যায়নি 🤨",
+            errors: 'ইমেইল এবং পাসওয়ার্ড এর মধ্যে মিল পাওয়া যায়নি 🤨',
           });
         }
         // generate a token and send to client
@@ -310,7 +310,7 @@ exports.signinController = (req, res) => {
           },
           process.env.JWT_SECRET,
           {
-            expiresIn: "7d",
+            expiresIn: '7d',
           }
         );
 
@@ -360,13 +360,13 @@ exports.adminMiddleware = (req, res, next) => {
   }).exec((err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: "ব্যবহারকারীর একাউন্ট খুঁজে পাওয়া যায়নি! 😕",
+        error: 'ব্যবহারকারীর একাউন্ট খুঁজে পাওয়া যায়নি! 😕',
       });
     }
 
-    if (user.role !== "admin") {
+    if (user.role !== 'admin') {
       return res.status(400).json({
-        error: "এটি এডমিন অ্যাকাউন্ট নয় । অ্যাক্সেস অস্বীকৃত। 🙄",
+        error: 'এটি এডমিন অ্যাকাউন্ট নয় । অ্যাক্সেস অস্বীকৃত। 🙄',
       });
     }
 
@@ -401,7 +401,7 @@ exports.forgotPasswordController = (req, res) => {
       (err, user) => {
         if (err || !user) {
           return res.status(400).json({
-            errors: "এই ইমেইল এর ব্যবহারকারী বিদ্যমান নেই! 😕",
+            errors: 'এই ইমেইল এর ব্যবহারকারী বিদ্যমান নেই! 😕',
           });
         }
 
@@ -412,7 +412,7 @@ exports.forgotPasswordController = (req, res) => {
           },
           process.env.JWT_RESET_PASSWORD,
           {
-            expiresIn: "12h",
+            expiresIn: '12h',
           }
         );
 
@@ -422,9 +422,9 @@ exports.forgotPasswordController = (req, res) => {
             const accessToken = await oAuth2Client.getAccessToken();
 
             const transport = nodemailer.createTransport({
-              service: "gmail",
+              service: 'gmail',
               auth: {
-                type: "OAuth2",
+                type: 'OAuth2',
                 user: process.env.EMAIL_FROM,
                 clientId: process.env.CLIENT_ID,
                 clientSecret: process.env.CLEINT_SECRET,
@@ -459,7 +459,7 @@ exports.forgotPasswordController = (req, res) => {
               // console.log("RESET PASSWORD LINK ERROR", err);
               return res.status(400).json({
                 errors:
-                  "ব্যবহারকারী পাসওয়ার্ড ডাটাবেস সংযোগ ত্রুটি অনুরোধ ভুল গেছে! 😕",
+                  'ব্যবহারকারী পাসওয়ার্ড ডাটাবেস সংযোগ ত্রুটি অনুরোধ ভুল গেছে! 😕',
               });
             } else {
               sendMail()
@@ -503,7 +503,7 @@ exports.resetPasswordController = (req, res) => {
         function (err, decoded) {
           if (err) {
             return res.status(400).json({
-              errors: "মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার চেষ্টা করুন। 😕",
+              errors: 'মেয়াদ উত্তীর্ণ লিঙ্ক। দয়া করে আবার চেষ্টা করুন। 😕',
             });
           }
 
@@ -515,13 +515,13 @@ exports.resetPasswordController = (req, res) => {
             (err, user) => {
               if (err || !user) {
                 return res.status(400).json({
-                  errors: "কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন! 😓",
+                  errors: 'কোথাও ত্রুটি ঘটছে, দয়া করে আবার চেষ্টা করুন! 😓',
                 });
               }
 
               const updatedFields = {
                 password: newPassword,
-                resetPasswordLink: "",
+                resetPasswordLink: '',
               };
 
               user = _.extend(user, updatedFields);
@@ -530,7 +530,7 @@ exports.resetPasswordController = (req, res) => {
                 if (err) {
                   return res.status(400).json({
                     errors:
-                      "ব্যবহারকারীর পাসওয়ার্ড পুনরায় সেট করার সময় ত্রুটি ঘটেছে! 😕",
+                      'ব্যবহারকারীর পাসওয়ার্ড পুনরায় সেট করার সময় ত্রুটি ঘটেছে! 😕',
                   });
                 }
                 res.json({
@@ -560,14 +560,14 @@ exports.googleController = (req, res) => {
       // if find registered user email
       if (email_verified) {
         User.findOne({ email })
-          .populate("followers following", "avatar name followers following")
+          .populate('followers following', 'avatar name followers following')
           .exec((err, user) => {
             if (user) {
               const token = jwt.sign(
                 { _id: user._id },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn: "7d",
+                  expiresIn: '7d',
                 }
               );
 
@@ -627,13 +627,13 @@ exports.googleController = (req, res) => {
               // if the user doesn't have registered email
               return res.status(400).json({
                 error:
-                  "এই জিমেইল অ্যাকাউন্টটি দিয়ে প্রথমে নিবন্ধন করুন। কেবলমাত্র নিবন্ধিত ইমেইল একাউন্ট দিয়েই গুগল অ্যাকাউন্টে সাইন ইন করা যাবে। 🙏",
+                  'এই জিমেইল অ্যাকাউন্টটি দিয়ে প্রথমে নিবন্ধন করুন। কেবলমাত্র নিবন্ধিত ইমেইল একাউন্ট দিয়েই গুগল অ্যাকাউন্টে সাইন ইন করা যাবে। 🙏',
               });
             }
           });
       } else {
         return res.status(400).json({
-          error: "গুগল একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন। 😕",
+          error: 'গুগল একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন। 😕',
         });
       }
     });
@@ -648,21 +648,21 @@ exports.facebookController = (req, res) => {
 
   return (
     fetch(url, {
-      method: "GET",
+      method: 'GET',
     })
       .then((response) => response.json())
       // .then(response => console.log(response))
       .then((response) => {
         const { email, name } = response;
         User.findOne({ email })
-          .populate("followers following", "avatar name followers following")
+          .populate('followers following', 'avatar name followers following')
           .exec((err, user) => {
             if (user) {
               const token = jwt.sign(
                 { _id: user._id },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn: "7d",
+                  expiresIn: '7d',
                 }
               );
 
@@ -720,7 +720,7 @@ exports.facebookController = (req, res) => {
 
               return res.status(400).json({
                 error:
-                  "ফেসবুক অ্যাকাউন্টটির ইমেল দিয়ে প্রথমে নিবন্ধন করুন। কেবল নিবন্ধিত ইমেল একাউন্ট দিয়েই ফেসবুক অ্যাকাউন্টের মাধ্যমে সাইন ইন করা যাবে। 🙏",
+                  'ফেসবুক অ্যাকাউন্টটির ইমেল দিয়ে প্রথমে নিবন্ধন করুন। কেবল নিবন্ধিত ইমেল একাউন্ট দিয়েই ফেসবুক অ্যাকাউন্টের মাধ্যমে সাইন ইন করা যাবে। 🙏',
               });
             }
           });
@@ -728,7 +728,7 @@ exports.facebookController = (req, res) => {
       .catch((error) => {
         return res.status(400).json({
           error:
-            "ফেসবুক একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন। 😕",
+            'ফেসবুক একাউন্ট দিয়ে লগইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন। 😕',
         });
       })
   );
