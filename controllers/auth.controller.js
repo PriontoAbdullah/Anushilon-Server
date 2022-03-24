@@ -89,7 +89,7 @@ exports.registerController = (req, res) => {
         });
 
         const emailData = {
-          from: process.env.EMAIL_FROM,
+          from: 'অনুশীলন টিম <anushilon.bd.gov@gmail.com>',
           to: email,
           subject: 'অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক',
           text: `আপনার অ্যাকাউন্টটি সক্রিয় করতে এই লিংকটিতে ক্লিক করুন - ${process.env.CLIENT_URL}/users/activate/${token}`,
@@ -192,7 +192,7 @@ exports.registrationController = (req, res) => {
         });
 
         const emailData = {
-          from: process.env.EMAIL_FROM,
+          from: 'অনুশীলন টিম <anushilon.bd.gov@gmail.com>',
           to: email,
           subject: 'অনুশীলনে অ্যাকাউন্ট সক্রিয়করণ লিঙ্ক',
           text: `আপনার অ্যাকাউন্টটি সক্রিয় করতে এই লিংকটিতে ক্লিক করুন - ${process.env.CLIENT_URL}/users/activate/${token}`,
@@ -434,7 +434,7 @@ exports.forgotPasswordController = (req, res) => {
             });
 
             const emailData = {
-              from: process.env.EMAIL_FROM,
+              from: 'অনুশীলন টিম <anushilon.bd.gov@gmail.com>',
               to: forgetEmail,
               subject: `অনুশীলনে পাসওয়ার্ড রিসেট লিঙ্ক`,
               text: `আপনার পাসওয়ার্ডটি পুনরায় সেট করতে নীচের লিঙ্কটি ব্যবহার করুন - ${process.env.CLIENT_URL}/users/password/reset/${token}`,
