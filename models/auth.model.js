@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const { Schema, model } = require("mongoose");
-const crypto = require("crypto");
+const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
+const crypto = require('crypto');
 // user schema
 const userScheama = new mongoose.Schema(
   {
@@ -23,47 +23,47 @@ const userScheama = new mongoose.Schema(
     salt: String,
     avatar: {
       type: String,
-      default: "https://i.imgur.com/R5o51PR.png",
+      default: 'https://i.ibb.co/1Ks65g5/avatar.png',
     },
     role: {
       type: String,
-      enum: ["institution", "student", "teacher"],
-      default: "student",
+      enum: ['institution', 'student', 'teacher'],
+      default: 'student',
     },
     address: {
-      type: String, 
-      default: ''
+      type: String,
+      default: '',
     },
     story: {
-        type: String, 
-        default: '',
-        maxlength: 200
+      type: String,
+      default: '',
+      maxlength: 200,
     },
     website: {
-      type: String, 
-      default: ''
+      type: String,
+      default: '',
     },
     followers: [
       {
-        type: mongoose.Types.ObjectId, 
-        ref: 'User'
-      }
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
     ],
     following: [
       {
-        type: mongoose.Types.ObjectId, 
-        ref: 'User'
-      }
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
     ],
     saved: [
       {
-        type: mongoose.Types.ObjectId, 
-        ref: 'User'
-      }
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
     ],
     resetPasswordLink: {
       data: String,
-      default: "",
+      default: '',
     },
   },
   {
@@ -73,7 +73,7 @@ const userScheama = new mongoose.Schema(
 
 // virtual
 userScheama
-  .virtual("password")
+  .virtual('password')
   .set(function (password) {
     this._password = password;
     this.salt = this.makeSalt();
@@ -90,20 +90,20 @@ userScheama.methods = {
   },
 
   encryptPassword: function (password) {
-    if (!password) return "";
+    if (!password) return '';
     try {
       return crypto
-        .createHmac("sha1", this.salt)
+        .createHmac('sha1', this.salt)
         .update(password)
-        .digest("hex");
+        .digest('hex');
     } catch (err) {
-      return "";
+      return '';
     }
   },
 
   makeSalt: function () {
-    return Math.round(new Date().valueOf() * Math.random()) + "";
+    return Math.round(new Date().valueOf() * Math.random()) + '';
   },
 };
 
-module.exports = mongoose.model("User", userScheama);
+module.exports = mongoose.model('User', userScheama);
